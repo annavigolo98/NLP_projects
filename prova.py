@@ -1,14 +1,14 @@
-import torch
 import numpy as np
+import pprint
+import json
+
 #DATASETS
 from datasets import load_dataset
 import nltk
 from nltk.corpus import brown
-import json
+
 #TOKENIZER
 from transformers import AutoTokenizer
-import pprint
-
 from transformers import DataCollatorForTokenClassification
 from transformers import AutoModelForTokenClassification
 from transformers import TrainingArguments
@@ -102,6 +102,23 @@ def tokenize_fn(batch):
     tokenized_inputs['labels'] = new_targets_batch
     return tokenized_inputs
 
+def compute_metrics(logits_and_labels):
+    logits, labels = logits_and_labels
+    preds=np.argmax(logits, axis=-1)
+
+    #remove -100 from labels and predictions
+    #and convert labels_ids to label names
+    str_labels=[
+        [label_names[t] for t in label if t!=-100] for label in labels
+    ]
+    # Remove -100 only if the true label is -100
+    str_preds = [
+        [label_names[p] for p, t in zip(pred, targ) if t!=-100] for pred, targ in zip(preds, labels)
+    ]
+    acc = np.mean(preds==labels)
+    return {
+        'accuracy': acc
+    }
 
 #TRY A CUSTOM SENTENCE TO SEE IF IT WORKS
 old_labels = [5, 3, 5]
@@ -122,23 +139,7 @@ batch = data_collator([tokenized_datasets['train'][0]])
 batch
 
 
-def compute_metrics(logits_and_labels):
-    logits, labels = logits_and_labels
-    preds=np.argmax(logits, axis=-1)
 
-    #remove -100 from labels and predictions
-    #and convert labels_ids to label names
-    str_labels=[
-        [label_names[t] for t in label if t!=-100] for label in labels
-    ]
-    # Remove -100 only if the true label is -100
-    str_preds = [
-        [label_names[p] for p, t in zip(pred, targ) if t!=-100] for pred, targ in zip(preds, labels)
-    ]
-    acc = np.mean(preds==labels)
-    return {
-        'accuracy': acc
-    }
 
 
 model = AutoModelForTokenClassification.from_pretrained(
@@ -168,20 +169,20 @@ trainer = Trainer(
 )
 
 
-trainer.train()
+#trainer.train()
 
-trainer.save_model('my_saved_NER_custom_model')
+#trainer.save_model('my_saved_NER_custom_model')
 
-pipeline(
-    'token-classification',
-    model='my_saved_NER_custom_model',
-    aggregation_strategy='simple',
-    device=0
-)
+#pipeline(
+#    'token-classification',
+#    model='my_saved_NER_custom_model',
+#    aggregation_strategy='simple',
+#    device=0
+#)
 
 
-s='I have been living in Germany for 6 months.'
-ner(s)
+#s='I have been living in Germany for 6 months.'
+#ner(s)
 
 
 
