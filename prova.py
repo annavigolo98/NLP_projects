@@ -38,14 +38,14 @@ print(label_names)
 json_dict = []
 
 for sentence in corpus:
-  json_dict.append({'inputs': [str(word) for (word, label) in sentence],
+    json_dict.append({'inputs': [str(word) for (word, label) in sentence],
                     'targets': [label2idx[label] for (word, label) in sentence]})
 
 
 print(json_dict[0],'\n', json_dict[1])
 
 with open('NER_data.json', 'w') as out_file:
-  json.dump(json_dict, out_file)
+    json.dump(json_dict, out_file)
 
 
 data = load_dataset('json', data_files='NER_data.json')
@@ -96,8 +96,8 @@ def tokenize_fn(batch):
     #print(len(old_targets_batch))
     new_targets_batch = []
     for i, old_targets in enumerate(old_targets_batch):
-    word_ids = tokenized_inputs.word_ids(i)
-    new_targets_batch.append(align_targets(old_targets, word_ids))
+        word_ids = tokenized_inputs.word_ids(i)
+        new_targets_batch.append(align_targets(old_targets, word_ids))
     #print(len(new_targets_batch))
     tokenized_inputs['labels'] = new_targets_batch
     return tokenized_inputs
@@ -129,7 +129,7 @@ word_ids = [None, 0, 0, 1, 2, 2, None]
 aligned_labels = align_targets(old_labels, word_ids)
 
 for x, y in zip(words, aligned_labels):
-print(f"{x}\t{y}")
+    print(f"{x}\t{y}")
 
 tokenized_datasets = splitted_dataset.map(tokenize_fn, batched=True, remove_columns=splitted_dataset['train'].column_names)
 tokenized_datasets['train'][0]
@@ -137,9 +137,6 @@ tokenized_datasets['train'][0]
 data_collator = DataCollatorForTokenClassification(tokenizer=tokenizer)
 batch = data_collator([tokenized_datasets['train'][0]])
 batch
-
-
-
 
 
 model = AutoModelForTokenClassification.from_pretrained(
