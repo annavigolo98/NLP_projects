@@ -102,6 +102,10 @@ def tokenize_fn(batch):
     tokenized_inputs['labels'] = new_targets_batch
     return tokenized_inputs
 
+def flatten(list_of_lists):
+    flattened = [val for sublist in list_of_lists for val in sublist]
+    return flattened
+
 def compute_metrics(logits_and_labels):
     logits, labels = logits_and_labels
     preds=np.argmax(logits, axis=-1)
@@ -115,9 +119,15 @@ def compute_metrics(logits_and_labels):
     str_preds = [
         [label_names[p] for p, t in zip(pred, targ) if t!=-100] for pred, targ in zip(preds, labels)
     ]
-    acc = np.mean(preds==labels)
+    labels_flat = flatten(str_labels)
+    preds_flat = flatten(str_preds)
+
+    acc = accuracy_score(labels_flat, preds_flat)
+    f1 = f1_score(labels_flat, preds_flat, average='macro')
+
     return {
-        'accuracy': acc
+        'accuracy': acc,
+        'f1_score': f1
     }
 
 #TRY A CUSTOM SENTENCE TO SEE IF IT WORKS
