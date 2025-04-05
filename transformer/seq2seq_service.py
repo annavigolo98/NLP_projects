@@ -110,7 +110,7 @@ class Seq2SeqService(BaseModel):
         print('Test losses: ', test_losses)
         #Save Model
         transformer.save_pretrained(r'transformer\saved_model\model')
-        tokenizer.save_pretrained(r'transformer\saved_model\tokenizer')
+        #tokenizer.save_pretrained(r'transformer\saved_model\tokenizer')
 
 
 
@@ -118,8 +118,10 @@ class Seq2SeqService(BaseModel):
         #Translate a sentence to test the model
         translator = Translator()
         #load tokenizer 
-        tokenizer = AutoTokenizer.from_pretrained(r'transformer\saved_model\model')
+        #tokenizer = AutoTokenizer.from_pretrained(r'transformer\saved_model\model')
 
+        model_checkpoint = 'Helsinki-NLP/opus-mt-en-es'
+        tokenizer = AutoTokenizer.from_pretrained(model_checkpoint)
         #Load model
         _, encoder, decoder = Transformer.from_pretrained(r'transformer\saved_model\model')
         device = Device.get_device()

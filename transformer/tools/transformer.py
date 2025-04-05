@@ -19,7 +19,7 @@ class Transformer(nn.Module):
         return dec_output
 
     def save_pretrained(self, save_directory):
-        os.makedir(save_directory, exist_ok=True)
+        os.makedirs(save_directory, exist_ok=True)
 
         torch.save(self.state_dict(), f"{save_directory}\pytorch_model.bin")
 
@@ -39,8 +39,8 @@ class Transformer(nn.Module):
             config_dict = json.load(f)
         
         # Reconstruct the encoder and decoder using the saved configuration
-        encoder = Encoder(config_dict['encoder_config'])
-        decoder = Decoder(config_dict['decoder_config'])
+        encoder = Encoder(**config_dict['encoder_config'])
+        decoder = Decoder(**config_dict['decoder_config'])
         
         # Initialize the transformer model
         model = cls(encoder, decoder, config_dict)
