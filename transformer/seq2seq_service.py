@@ -5,14 +5,11 @@ from transformers import AutoTokenizer
 from transformers import DataCollatorForSeq2Seq
 from torch.utils.data import DataLoader
 
-from datetime import datetime
-import numpy as np
-
-
 from transformer.repository.load_data import LoadData
 from transformer.tools.data_processor import DataProcessor
 from transformer.tools.decoder import Decoder
 from transformer.tools.device import Device
+
 from transformer.tools.encoder import Encoder
 from transformer.tools.train import Train
 from transformer.tools.transformer import Transformer
