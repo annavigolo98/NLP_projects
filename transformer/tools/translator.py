@@ -20,7 +20,7 @@ class Translator(BaseModel):
         dec_attn_mask = torch.ones_like(dec_input_ids, device=device)
 
         #decoder loop
-        for _ in range(150):
+        for _ in range(32):
             dec_output = decoder(
                 enc_output,
                 dec_input_ids,
