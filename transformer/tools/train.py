@@ -2,6 +2,7 @@ from datetime import datetime
 import numpy as np
 from pydantic import BaseModel
 import torch
+from tqdm import tqdm
 
 
 
@@ -23,7 +24,7 @@ class Train(BaseModel):
             model.train()
             t0 = datetime.now()
             train_loss = []
-            for batch in train_loader:
+            for batch in tqdm(train_loader):
                 #Move data to the GPU
                 batch = {k: v.to(device) for k,v in batch.items()}
 

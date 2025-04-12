@@ -20,6 +20,7 @@ class Seq2SeqService(BaseModel):
     def handle_seq2seq(self):
         
         device = Device.get_device()
+        print('Device: ', device)
         dataset_loader = LoadData()
         data_processor = DataProcessor()
         
@@ -98,7 +99,7 @@ class Seq2SeqService(BaseModel):
                                                   optimizer, 
                                                   train_loader, 
                                                   valid_loader, 
-                                                  epochs=5,
+                                                  epochs=15,
                                                   device=device,
                                                   tokenizer=tokenizer)
         
@@ -107,7 +108,7 @@ class Seq2SeqService(BaseModel):
         print('Test losses: ', test_losses)
         #Save Model
         transformer.save_pretrained(r'transformer\saved_model\model')
-        #tokenizer.save_pretrained(r'transformer\saved_model\tokenizer')
+        tokenizer.save_pretrained(r'transformer\saved_model\tokenizer')
 
 
 
@@ -115,14 +116,15 @@ class Seq2SeqService(BaseModel):
         #Translate a sentence to test the model
         translator = Translator()
         #load tokenizer 
-        #tokenizer = AutoTokenizer.from_pretrained(r'transformer\saved_model\model')
+        tokenizer = AutoTokenizer.from_pretrained(r'transformer\saved_model\tokenizer')
 
-        model_checkpoint = 'Helsinki-NLP/opus-mt-en-es'
-        tokenizer = AutoTokenizer.from_pretrained(model_checkpoint)
+        #odel_checkpoint = 'Helsinki-NLP/opus-mt-en-es'
+        #okenizer = AutoTokenizer.from_pretrained(model_checkpoint)
         #Load model
         _, encoder, decoder = Transformer.from_pretrained(r'transformer\saved_model\model')
         device = Device.get_device()
-
+        encoder.to(device)
+        decoder.to(device)
         translation = translator.translate(sentence_to_translate,
                                            tokenizer,
                                            encoder,

@@ -11,6 +11,7 @@ class Translator(BaseModel):
                   device):
             
         # get the encoder output first
+        print('Device: ', device)
         enc_input = tokenizer(input_sentence, return_tensors='pt').to(device)
         enc_output = encoder(enc_input['input_ids'], enc_input['attention_mask'])
 
@@ -19,7 +20,7 @@ class Translator(BaseModel):
         dec_attn_mask = torch.ones_like(dec_input_ids, device=device)
 
         #decoder loop
-        for _ in range(32):
+        for _ in range(150):
             dec_output = decoder(
                 enc_output,
                 dec_input_ids,
