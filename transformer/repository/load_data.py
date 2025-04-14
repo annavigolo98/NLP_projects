@@ -6,7 +6,7 @@ class LoadData(BaseModel):
 
     def load_dataset(self):
         df = pd.read_csv(r'transformer\data\spa.txt', sep='\t', header=None)
-        df = df.iloc[:30_000]
+        df = df.iloc[:300_000]
         df.columns = ['en', 'es']
         df.to_csv(r'transformer\data\spa.csv', index=None)
 
