@@ -38,13 +38,13 @@ class Seq2SeqService(BaseModel):
         train_loader = DataLoader(
             tokenized_datasets['train'],
             shuffle=True,
-            batch_size=32,
+            batch_size=64,
             collate_fn=data_collator
         )
 
         valid_loader = DataLoader(
             tokenized_datasets['test'],
-            batch_size=32,
+            batch_size=64,
             collate_fn=data_collator
         )
 
