@@ -18,7 +18,7 @@ class SentimentAnalysisService(BaseModel):
         tokenized_dataset = data_processor.tokenizer_function(dataset, tokenizer)
         training_arguments = TrainingArguments(
             'my_trainer',
-            evaluation_strategy='epoch',
+            eval_strategy='epoch',
             save_strategy='epoch',
             num_train_epochs=1
             )
@@ -40,7 +40,7 @@ class SentimentAnalysisService(BaseModel):
         trainer.train()
 
         #Save the model
-        trainer.save_model('./saved_model')
+        trainer.save_model('sentiments/saved_model')
 
         
         print(tokenized_dataset)
