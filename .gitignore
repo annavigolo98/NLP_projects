@@ -1,4 +1,10 @@
 *venv
 *.pyc
-config.json 
+*json
 *.bin
+*.pt
+*.safetensors
+*.pth
+*.spm
+spa.csv
+vocab.txt
