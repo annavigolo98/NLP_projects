@@ -14,6 +14,7 @@ from transformers import AutoModelForTokenClassification
 from transformers import TrainingArguments
 from transformers import Trainer
 from transformers import pipeline
+from sklearn.metrics import accuracy_score, f1_score
 
 #!pip install transformers datasets
 #!pip install opencv-python
@@ -44,11 +45,11 @@ for sentence in corpus:
 
 print(json_dict[0],'\n', json_dict[1])
 
-with open('NER_data.json', 'w') as out_file:
+with open('NER/data/NER_data.json', 'w') as out_file:
     json.dump(json_dict, out_file)
 
 
-data = load_dataset('json', data_files='NER_data.json')
+data = load_dataset('json', data_files='NER/data/NER_data.json')
 print(data)
 print(data['train'][0])
 splitted_dataset = data['train'].train_test_split(test_size=0.3, seed=42)
