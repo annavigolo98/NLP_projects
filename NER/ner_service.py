@@ -62,7 +62,7 @@ class NERService(BaseModel):
 
         training_arguments = TrainingArguments(
             'distilbert-finetuned-ner',
-            evaluation_strategy = 'epoch', 
+            eval_strategy = 'epoch', 
             save_strategy = 'epoch',
             learning_rate = 2e-05,
             num_train_epochs = 3,
