@@ -83,5 +83,5 @@ class TranslatorService(BaseModel):
         print(trainer.evaluate(max_length=max_target_length))
 
         #Save the model
-        trainer.save_model('translator/saved/model')
+        trainer.save_model('translator/saved_model')
 
