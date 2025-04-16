@@ -17,7 +17,7 @@ class SentimentAnalysisService(BaseModel):
         data_processor = DataProcessor()
         tokenized_dataset = data_processor.tokenizer_function(dataset, tokenizer)
         training_arguments = TrainingArguments(
-            'my_trainer',
+            'sentiments/checkpoints',
             eval_strategy='epoch',
             save_strategy='epoch',
             num_train_epochs=1

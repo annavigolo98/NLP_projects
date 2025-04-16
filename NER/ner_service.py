@@ -61,7 +61,7 @@ class NERService(BaseModel):
         metric_evaluator = MetricEvaluator()
 
         training_arguments = TrainingArguments(
-            'distilbert-finetuned-ner',
+            'NER/checkpoints',
             eval_strategy = 'epoch', 
             save_strategy = 'epoch',
             learning_rate = 2e-05,

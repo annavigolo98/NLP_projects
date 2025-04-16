@@ -8,7 +8,6 @@ from translator.plotter import Plotter
 from transformers import AutoModelForSeq2SeqLM 
 from transformers import DataCollatorForSeq2Seq
 from transformers import Seq2SeqTrainingArguments, Seq2SeqTrainer
-import tempfile
 
 class TranslatorService(BaseModel):
     def handle_translations(self, seed):
@@ -50,10 +49,9 @@ class TranslatorService(BaseModel):
 
         evaluator = MetricEvaluator(tokenizer, translated_language='fr')
 
-        tmp_dir = tempfile.mkdtemp()
 
         training_arguments = Seq2SeqTrainingArguments(
-            output_dir=tmp_dir,
+            output_dir='translator/checkpoints',
             eval_strategy='no', # avoid it here, very time consuming
             save_strategy='epoch',
             learning_rate=2e-05,
@@ -76,11 +74,11 @@ class TranslatorService(BaseModel):
             compute_metrics = evaluator
             )
         
-        print(trainer.evaluate(max_length=max_target_length))
+        trainer.evaluate(max_length=max_target_length)
 
         trainer.train()
         
-        print(trainer.evaluate(max_length=max_target_length))
+        trainer.evaluate(max_length=max_target_length)
 
         #Save the model
         trainer.save_model('translator/saved_model')
