@@ -74,12 +74,14 @@ class TranslatorService(BaseModel):
             compute_metrics = evaluator
             )
         
-        trainer.evaluate(max_length=max_target_length)
+        evaluate_1 = trainer.evaluate(max_length=max_target_length)
 
         trainer.train()
         
-        trainer.evaluate(max_length=max_target_length)
+        evaluate_2 = trainer.evaluate(max_length=max_target_length)
 
+        print('Evaluate before training:', evaluate_1)
+        print('Evaluate after training:', evaluate_2)
         #Save the model
         trainer.save_model('translator/saved_model')
 
