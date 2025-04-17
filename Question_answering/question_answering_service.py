@@ -7,7 +7,7 @@ class QuestionAnsweringService(BaseModel):
     def handle_question_answering(self):
         '''Handler of QA Task, This extracts the answer to a specific question from a document.'''
         dataset = load_dataset('squad')
-        print(dataset['train'][0]['answers'])
+        #print(dataset['train'][0]['answers'])
 
         #Tokenizer
         checkpoint='distilbert-base-cased'
@@ -15,8 +15,8 @@ class QuestionAnsweringService(BaseModel):
 
         #Example of tokenization with question-context
 
-        context = dataset['train'][0]['context']
-        question = dataset['train'][0]['question']
+        #context = dataset['train'][0]['context']
+        #question = dataset['train'][0]['question']
 
         #max_length is the maximum length in tokens of a context window
         #stride is the number of overlapping tokens for each context window
@@ -27,13 +27,13 @@ class QuestionAnsweringService(BaseModel):
         #The characters even in subcontext, refer to the word positions in the original context (non-splitted)
 
 
-        tokenized_input = tokenizer(question,
-                                      context,
-                                      max_length=100,
-                                      truncation='only_second',
-                                      stride=50,
-                                      return_overflowing_tokens=True,
-                                      return_offsets_mapping=True)
+        #tokenized_batch = tokenizer(question,
+        #                              context,
+        #                              max_length=100,
+        #                              truncation='only_second',
+        #                              stride=50,
+        #                              return_overflowing_tokens=True,
+        #                              return_offsets_mapping=True)
         
         #idx=2
         #print('Number of context windows:' , len(tokenized_input), '\n')
@@ -50,11 +50,11 @@ class QuestionAnsweringService(BaseModel):
         #      start_context_token, ', ', end_context_token, '\n')
 
         #Find answer in the context window (if completely contained in it)
-        answer = dataset['train'][0]['answers']
-        start_answer_char = answer['answer_start'][0]
-        end_answer_char = len(answer['text'][0]) + start_answer_char
-        print('Start and end answer chars in the original context (not splitted)', 
-              start_answer_char, ', ', end_answer_char, '\n')
+        #answer = dataset['train'][0]['answers']
+        #start_answer_char = answer['answer_start'][0]
+        #end_answer_char = len(answer['text'][0]) + start_answer_char
+        #print('Start and end answer chars in the original context (not splitted)', 
+        #      start_answer_char, ', ', end_answer_char, '\n')
 
         #Find the char position of the first token in the first context window 
         #(char is relative to original non splitted context)
@@ -107,27 +107,58 @@ class QuestionAnsweringService(BaseModel):
         #print('Founded answer tokens: ', start_answer_token, ', ', end_answer_token, '\n')
         #print('Answer: ', answer, '\n')
 
-
-        start_answer_tokens = []
-        end_answer_tokens = []
-
-        for i, offset in enumerate(tokenized_input['offset_mapping']):
-            #Find the start and end tokens of the context in the specific subcontext:
-            sequence_ids = tokenized_input.sequence_ids(i)
-            start_context_token = sequence_ids.index(1)
-            end_context_token = len(sequence_ids) - sequence_ids[::-1].index(1) -1
-
-            start_answer_token, end_answer_token = find_answer(offset,
-                                                               start_context_token,
-                                                               end_context_token,
-                                                               start_answer_char,
-                                                               end_answer_char)
-            start_answer_tokens.append(start_answer_token)
-            end_answer_tokens.append(end_answer_token)
+        max_length = 384
+        stride = 128
         
-        print('Start tokens answer: ', start_answer_tokens, '\n')
-        print('End tokens answers: ', end_answer_tokens, '\n')
+        def tokenize_fn(batch, tokenizer, max_length, stride):
+            questions = [q.strip() for q in batch['question']]
 
+            tokenized_batch = tokenizer(questions,
+                                        batch['context'],
+                                        max_length=max_length,
+                                        truncation='only_second',
+                                        stride=stride,
+                                        return_overflowing_tokens=True,
+                                        return_offsets_mapping=True,
+                                        padding='max_length'
+                                        )
+            offset_mapping = tokenized_batch.pop('offset_mapping')
+            original_sample_ids = tokenized_batch.pop('overflow_to_sample_mapping')
+            answers = batch['answers']
+
+            start_answer_tokens = []
+            end_answer_tokens = []
+
+            for i, offset in enumerate(offset_mapping):
+                #Find the start and end tokens of the context in the specific subcontext:
+                sequence_ids = tokenized_batch.sequence_ids(i)
+                start_context_token = sequence_ids.index(1)
+                end_context_token = len(sequence_ids) - sequence_ids[::-1].index(1) -1
+                #Find the answer start and end chars
+                sample_idx = original_sample_ids[i]
+                answer = answers[sample_idx]
+                start_answer_char = answer['answer_start'][0]
+                end_answer_char = len(answer['text'][0]) + start_answer_char
+
+                start_answer_token, end_answer_token = find_answer(offset,
+                                                                start_context_token,
+                                                                end_context_token,
+                                                                start_answer_char,
+                                                                end_answer_char)
+                start_answer_tokens.append(start_answer_token)
+                end_answer_tokens.append(end_answer_token)
+            tokenized_batch['start_positions'] = start_answer_tokens
+            tokenized_batch['end_positions'] = end_answer_tokens
+            return tokenized_batch
+        
+        tokenized_train_dataset = dataset['train'].map(lambda batch: tokenize_fn(batch, 
+                                                                                 tokenizer, 
+                                                                                 max_length, 
+                                                                                 stride), 
+                                                        batched=True,
+                                                        remove_columns=dataset['train'].column_names)
+
+        print(len(tokenized_train_dataset))
             
 
 
