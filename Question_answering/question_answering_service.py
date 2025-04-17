@@ -56,18 +56,20 @@ class QuestionAnsweringService(BaseModel):
         )
 
         trainer.train()
-        trainer_output = trainer.predict(tokenized_validation_dataset)
-        predictions, _, _ = trainer_output 
-        start_logits, end_logits = predictions
+        trainer.save_model('Question_answering/saved_model')
+        #trainer_output = trainer.predict(tokenized_validation_dataset)
+        #predictions, _, _ = trainer_output 
+        #start_logits, end_logits = predictions
+        
 
         #Evaluate metrics 
-        metric_evaluator = MetricEvaluator()
-        computed_metric = metric_evaluator.compute_metrics(start_logits,
-                                                           end_logits,
-                                                           tokenized_validation_dataset,
-                                                           dataset['validation'])
-        print('Computed_metric: ', computed_metric, '\n')
-        trainer.save_model('Question_answering/saved_model')
+        #metric_evaluator = MetricEvaluator()
+        #computed_metric = metric_evaluator.compute_metrics(start_logits,
+        #                                                   end_logits,
+        #                                                   tokenized_validation_dataset,
+        #                                                   dataset['validation'])
+        #print('Computed_metric: ', computed_metric, '\n')
+        
 
             
 
