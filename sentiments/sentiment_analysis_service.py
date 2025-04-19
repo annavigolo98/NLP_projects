@@ -5,7 +5,6 @@ from transformers import TrainingArguments
 from sentiments.data_processor import DataProcessor
 from transformers import AutoModelForSequenceClassification
 from transformers import Trainer
-
 from sentiments.metric_evaluator import MetricEvaluator
 
 class SentimentAnalysisService(BaseModel):
@@ -42,5 +41,3 @@ class SentimentAnalysisService(BaseModel):
         #Save the model
         trainer.save_model('sentiments/saved_model')
 
-        
-        print(tokenized_dataset)

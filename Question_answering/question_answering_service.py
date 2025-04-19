@@ -63,12 +63,12 @@ class QuestionAnsweringService(BaseModel):
         
 
         #Evaluate metrics 
-        metric_evaluator = MetricEvaluator()
-        computed_metric = metric_evaluator.compute_metrics(start_logits,
-                                                           end_logits,
-                                                           tokenized_validation_dataset,
-                                                           dataset['validation'])
-        print('Computed_metric: ', computed_metric, '\n')
+        #metric_evaluator = MetricEvaluator()
+        #computed_metric = metric_evaluator.compute_metrics(start_logits,
+        #                                                   end_logits,
+        #                                                   tokenized_validation_dataset,
+        #                                                   dataset['validation'])
+        #print('Computed_metric: ', computed_metric, '\n')
         
 
             
