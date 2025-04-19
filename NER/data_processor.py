@@ -34,7 +34,6 @@ class DataProcessor(BaseModel):
             new_labels.append(label)
         return new_labels 
     
-    #map(lambda batch: _tokenize_fn_train(batch, tokenizer), batched=True, remove_columns=small_raw_datasets_train.column_names)
     def _tokenize_fn(self, batch, tokenizer):
         
         tokenized_batch = tokenizer(batch['tokens'], is_split_into_words=True, truncation=True)

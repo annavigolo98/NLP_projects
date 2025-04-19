@@ -35,22 +35,6 @@ class NERService(BaseModel):
         #print('Word ids (i.e. indexes of the words in the sentence before tokenization: )', tokenized_example.word_ids())
         data_processor = DataProcessor()
         tokenized_dataset = data_processor.tokenizer(dataset, tokenizer)
-        print(tokenized_dataset)
-
-
-        #EXAMPLE 
-        #old_labels_example = [7, 0, 0, 0, 3]
-        #words_example = ['[CLS]', 'Ger', '##man', 'call', 'to', 'boycott', 'Micro', '##soft', '[SEP]']
-        #word_ids_example = [None, 0, 0, 1, 2, 3, 4, 4, None]
-        #idx2label = {0: 'O', 1: 'B-PER', 2: 'I-PER', 3: 'B-ORG', 4: 'I-ORG', 
-        #                 5: 'B-LOC', 6: 'I-LOC', 7: 'B-MISC', 8: 'I-MISC'}
-            
-        #new_labels = data_processor._align_targets(word_ids_example, old_labels_example)
-
-        #new_label_names = [idx2label[new_label] if new_label != -100 else -100 for new_label in new_labels]
-
-        #for word, label_name in zip(words_example, new_label_names):
-        #    print(word, label_name) 
         
         data_collator = DataCollatorForTokenClassification(tokenizer=tokenizer)
     
