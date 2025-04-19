@@ -39,7 +39,7 @@ class QuestionAnsweringService(BaseModel):
             eval_strategy='no',
             save_strategy='epoch',
             learning_rate=2e-05,
-            num_train_epochs=3,
+            num_train_epochs=1,
             weight_decay=0.01,
             fp16=True
         )
@@ -50,25 +50,25 @@ class QuestionAnsweringService(BaseModel):
         trainer = Trainer(
             model=model,
             args=arguments,
-            train_dataset = tokenized_train_dataset,
+            train_dataset = tokenized_train_dataset.select(range(50)).shuffle(seed=42),
             eval_dataset = tokenized_validation_dataset,
             tokenizer=tokenizer
         )
 
         trainer.train()
         trainer.save_model('Question_answering/saved_model')
-        #trainer_output = trainer.predict(tokenized_validation_dataset)
-        #predictions, _, _ = trainer_output 
-        #start_logits, end_logits = predictions
+        trainer_output = trainer.predict(tokenized_validation_dataset)
+        predictions, _, _ = trainer_output 
+        start_logits, end_logits = predictions
         
 
         #Evaluate metrics 
-        #metric_evaluator = MetricEvaluator()
-        #computed_metric = metric_evaluator.compute_metrics(start_logits,
-        #                                                   end_logits,
-        #                                                   tokenized_validation_dataset,
-        #                                                   dataset['validation'])
-        #print('Computed_metric: ', computed_metric, '\n')
+        metric_evaluator = MetricEvaluator()
+        computed_metric = metric_evaluator.compute_metrics(start_logits,
+                                                           end_logits,
+                                                           tokenized_validation_dataset,
+                                                           dataset['validation'])
+        print('Computed_metric: ', computed_metric, '\n')
         
 
             

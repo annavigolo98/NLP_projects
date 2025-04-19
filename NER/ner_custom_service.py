@@ -50,7 +50,7 @@ class NERCustomService(BaseModel):
         trainer = Trainer(
             model=model,
             args=training_args,
-            train_dataset=tokenized_datasets['train'].select(range(100)),
+            train_dataset=tokenized_datasets['train'].select(range(100)).shuffle(seed=42),
             eval_dataset=tokenized_datasets['test'],
             data_collator=data_collator,
             compute_metrics=metric_eval,

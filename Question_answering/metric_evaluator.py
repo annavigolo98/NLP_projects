@@ -1,4 +1,5 @@
 import evaluate 
+import numpy as np
 from tqdm import tqdm 
 
 class MetricEvaluator:
@@ -14,13 +15,10 @@ class MetricEvaluator:
 
             sample_id2idxs = {}
             for i, id_ in enumerate(processed_dataset['sample_id']):
-                if id_ not in sample_id2idxs:
-                    sample_id2idxs[id_] = [i]
-                else:
-                    sample_id2idxs[id_].append(i)
+                sample_id2idxs.setdefault(id_, []).append(i)
             
-            n_largest = 20 # max number of logits we want to look at
-
+            
+            n_largest = 15 # max number of logits we want to look at
             max_answer_length = 30 #maximum number of token we want to find in the answer
             predicted_answers = []
 
@@ -31,27 +29,23 @@ class MetricEvaluator:
                 best_score = float('-inf')
                 best_answer = None 
 
-                for idx in sample_id2idxs[sample_id]:
+                for idx in sample_id2idxs.get(sample_id, []):
                     start_logit = start_logits[idx]
                     end_logit = end_logits[idx]
                     offsets = processed_dataset['offset_mapping'][idx]
-                    start_indices = (-start_logit).argsort()
-                    end_indices = (-end_logit).argsort()
+                    start_indices = np.argsort(start_logit)[:n_largest]
+                    end_indices = np.argsort(end_logit)[:n_largest]
 
-                    for start_idx in start_indices[:n_largest]:
-                        for end_idx in end_indices[:n_largest]:
-                            if offsets[start_idx] is None or offsets[end_idx] is None:
+                    for start_idx in reversed(start_indices):
+                        for end_idx in reversed(end_indices):
+                            if offsets[start_idx] is None or offsets[end_idx] is None or end_idx < start_idx or end_idx-start_idx+1 > max_answer_length:
                                 continue 
-                            if end_idx < start_idx:
-                                continue 
-                            if end_idx-start_idx+1 > max_answer_length:
-                                continue 
+                            
                             score = start_logit[start_idx] + end_logit[end_idx]
 
                             if score > best_score:
                                 best_score = score 
-                                first_ch = offsets[start_idx][0]
-                                last_ch = offsets[end_idx][1]
+                                first_ch, last_ch = offsets[start_idx][0], offsets[end_idx][1]
                                 best_answer = context[first_ch:last_ch]
 
                 predicted_answers.append({'id': sample_id, 'prediction_text': best_answer})
