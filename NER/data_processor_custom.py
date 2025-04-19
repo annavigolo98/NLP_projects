@@ -23,13 +23,13 @@ class DataProcessorCustom(BaseModel):
             elif word != previous_word:
                 label = old_labels[word]
 
-            else:
+            elif word == previous_word:
                 label = old_labels[word]
 
             labels.append(label)
             previous_word = word
 
-            return labels
+        return labels
 
 
     def _tokenize_fn(self, batch, tokenizer):

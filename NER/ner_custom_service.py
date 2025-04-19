@@ -42,7 +42,7 @@ class NERCustomService(BaseModel):
             evaluation_strategy='epoch',
             save_strategy='epoch',
             learning_rate=2e-5,
-            num_train_epochs=3,
+            num_train_epochs=1,
             weight_decay=0.01
         )
 
@@ -50,7 +50,7 @@ class NERCustomService(BaseModel):
         trainer = Trainer(
             model=model,
             args=training_args,
-            train_dataset=tokenized_datasets['train'],
+            train_dataset=tokenized_datasets['train'].select(range(100)),
             eval_dataset=tokenized_datasets['test'],
             data_collator=data_collator,
             compute_metrics=metric_eval,
@@ -60,7 +60,7 @@ class NERCustomService(BaseModel):
 
         trainer.train()
 
-        trainer.save_model('NER/saved_model_custom')
+        #trainer.save_model('NER/saved_model_custom')
 
         
 
