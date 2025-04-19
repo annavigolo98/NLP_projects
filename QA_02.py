@@ -3,7 +3,7 @@ from Question_answering.question_answering_eval_service import QuestionAnswering
 
 def main():
     question_answering_eval_service = QuestionAnsweringEvalService()
-    context = 'Today I went to the store to purchase a carton of milk'
+    context = 'I went to the store to build a carton of milk.'
     question = 'What did I buy?'
     question_answering_eval_service.evaluate_question_answering(context, question)
 
