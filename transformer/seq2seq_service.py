@@ -20,18 +20,15 @@ class Seq2SeqService(BaseModel):
     def handle_seq2seq(self):
         
         device = Device.get_device()
-        print('Device: ', device)
         dataset_loader = LoadData()
         data_processor = DataProcessor()
         
         raw_dataset = dataset_loader.load_dataset()
         split = data_processor.train_test_split(raw_dataset, test_size=0.3)
         
-        #Tokenize datasets 
         model_checkpoint = 'Helsinki-NLP/opus-mt-en-es'
         tokenizer = AutoTokenizer.from_pretrained(model_checkpoint)
         tokenized_datasets = data_processor.tokenizer(split, tokenizer)
-        print(tokenized_datasets)
 
         data_collator = DataCollatorForSeq2Seq(tokenizer)
 
@@ -48,12 +45,7 @@ class Seq2SeqService(BaseModel):
             collate_fn=data_collator
         )
 
-        print(tokenizer.vocab_size)
-
-        #Add start of sentence token
         tokenizer.add_special_tokens({'cls_token': '<s>'})
-
-        print(tokenizer('<s>'))
 
         encoder_config = {
             'vocab_size': tokenizer.vocab_size +1,
@@ -88,7 +80,6 @@ class Seq2SeqService(BaseModel):
         encoder.to(device)
         decoder.to(device)
 
-        #Loss and Optimizer
         criterion = nn.CrossEntropyLoss(ignore_index=-100)  # ignore pad tokens in the labels (here represented by -100)
         optimizer = torch.optim.Adam(transformer.parameters())
 
@@ -113,14 +104,9 @@ class Seq2SeqService(BaseModel):
 
 
     def translate_sentence(self, sentence_to_translate):
-        #Translate a sentence to test the model
         translator = Translator()
-        #load tokenizer 
         tokenizer = AutoTokenizer.from_pretrained(r'transformer\saved_model\tokenizer')
 
-        #odel_checkpoint = 'Helsinki-NLP/opus-mt-en-es'
-        #okenizer = AutoTokenizer.from_pretrained(model_checkpoint)
-        #Load model
         _, encoder, decoder = Transformer.from_pretrained(r'transformer\saved_model\model')
         device = Device.get_device()
         encoder.to(device)

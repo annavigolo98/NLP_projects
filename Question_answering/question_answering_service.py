@@ -11,7 +11,6 @@ class QuestionAnsweringService(BaseModel):
         '''Handler of QA Task, This extracts the answer to a specific question from a document.'''
         dataset = load_dataset('squad')
 
-        #Tokenizer
         checkpoint='distilbert-base-cased'
         tokenizer = AutoTokenizer.from_pretrained(checkpoint)
 
@@ -23,17 +22,12 @@ class QuestionAnsweringService(BaseModel):
                                                                  tokenizer,
                                                                  max_length,
                                                                  stride)
-        
-        print(len(tokenized_train_dataset))
-
 
         tokenized_validation_dataset = data_processor.tokenizer_validation(dataset['validation'],
                                                                  tokenizer,
                                                                  max_length,
                                                                  stride)
         
-        print(len(tokenized_validation_dataset))
-    
         arguments = TrainingArguments(
             'Question_answering/checkpoints',
             eval_strategy='no',
@@ -44,7 +38,6 @@ class QuestionAnsweringService(BaseModel):
             fp16=True
         )
 
-        #LOAD MODEL
         model = AutoModelForQuestionAnswering.from_pretrained(checkpoint)
 
         trainer = Trainer(
@@ -61,14 +54,12 @@ class QuestionAnsweringService(BaseModel):
         predictions, _, _ = trainer_output 
         start_logits, end_logits = predictions
         
-
-        #Evaluate metrics 
-        #metric_evaluator = MetricEvaluator()
-        #computed_metric = metric_evaluator.compute_metrics(start_logits,
-        #                                                   end_logits,
-        #                                                   tokenized_validation_dataset,
-        #                                                   dataset['validation'])
-        #print('Computed_metric: ', computed_metric, '\n')
+        metric_evaluator = MetricEvaluator()
+        computed_metric = metric_evaluator.compute_metrics(start_logits,
+                                                           end_logits,
+                                                           tokenized_validation_dataset,
+                                                           dataset['validation'])
+        print('Computed_metric: ', computed_metric, '\n')
         
 
             
