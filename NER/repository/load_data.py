@@ -1,6 +1,4 @@
 from pydantic import BaseModel
-
-#DATASETS
 from datasets import load_dataset
 import nltk
 from nltk.corpus import brown

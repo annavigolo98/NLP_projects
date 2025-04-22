@@ -1,7 +1,6 @@
 
 from pydantic import BaseModel
 from transformers import pipeline
-from transformers import AutoTokenizer
 
 class SentimentEvaluationService(BaseModel):
 

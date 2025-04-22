@@ -57,7 +57,6 @@ class Encoder(nn.Module):
         x = self.pos_encoding(x)
         for block in self.transformer_blocks:
             x = block(x, pad_mask)
-        #MANY TO MANY
 
         x = self.ln(x)
         return x

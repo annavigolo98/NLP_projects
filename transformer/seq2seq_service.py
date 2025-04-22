@@ -97,7 +97,7 @@ class Seq2SeqService(BaseModel):
 
         print('Train losses: ', train_losses, '\n')
         print('Test losses: ', test_losses)
-        #Save Model
+        
         transformer.save_pretrained(r'transformer\saved_model\model')
         tokenizer.save_pretrained(r'transformer\saved_model\tokenizer')
 

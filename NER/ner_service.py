@@ -14,25 +14,16 @@ class NERService(BaseModel):
     def handle_NER(self):
         '''logic to implement Named Entity Recognition'''
         dataset = load_dataset('conll2003', trust_remote_code=True)
-        #print(dataset)
-        print('Positional tags: ',dataset['train'][0]['pos_tags'])
-        print('Chunk tags: ',dataset['train'][0]['chunk_tags'])
-        print('NER tags: ',dataset['train'][0]['ner_tags'])
-
 
         id2label = {0: 'O', 1: 'B-PER', 2: 'I-PER', 3: 'B-ORG', 4: 'I-ORG', 
                         5: 'B-LOC', 6: 'I-LOC', 7: 'B-MISC', 8: 'I-MISC'}
         
         label2id = {'O': 0, 'B-PER': 1, 'I-PER': 2, 'B-ORG': 3, 'I-ORG': 4, 'B-LOC': 5, 'I-LOC': 6, 
                         'B-MISC': 7, 'I-MISC': 8}
-
-        #print('Unique NER tags: ', dataset['train'].features['ner_tags'].feature.names)
-        #['O', 'B-PER', 'I-PER', 'B-ORG', 'I-ORG', 'B-LOC', 'I-LOC', 'B-MISC', 'I-MISC']
-        # Load the tokenizer 
+ 
         checkpoint = 'distilbert-base-cased'
         tokenizer = AutoTokenizer.from_pretrained(checkpoint)
-        #tokenized_example = tokenizer(dataset['train'][5]['tokens'], is_split_into_words=True)
-        #print('Word ids (i.e. indexes of the words in the sentence before tokenization: )', tokenized_example.word_ids())
+        
         data_processor = DataProcessor()
         tokenized_dataset = data_processor.tokenizer(dataset, tokenizer)
         
@@ -64,9 +55,7 @@ class NERService(BaseModel):
             )
         
         trainer.train()
-        #save the model
         trainer.save_model('NER/saved_model')
-        print('Something')
 
 
 

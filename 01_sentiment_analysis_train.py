@@ -1,5 +1,3 @@
-
-#!pip install transformers datasets sentencepiece sacremoses
 from sentiments.sentiment_analysis_service import SentimentAnalysisService
 
 

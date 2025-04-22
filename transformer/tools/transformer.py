@@ -34,18 +34,14 @@ class Transformer(nn.Module):
 
     @classmethod
     def from_pretrained(cls, save_directory):
-        # Load the model configuration
         with open(f"{save_directory}/config.json", 'r') as f:
             config_dict = json.load(f)
         
-        # Reconstruct the encoder and decoder using the saved configuration
         encoder = Encoder(**config_dict['encoder_config'])
         decoder = Decoder(**config_dict['decoder_config'])
         
-        # Initialize the transformer model
         model = cls(encoder, decoder, config_dict)
         
-        # Load the model weights (state dict)
         model.load_state_dict(torch.load(f"{save_directory}/pytorch_model.bin"))
         
         return model, encoder, decoder

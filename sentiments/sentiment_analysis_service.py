@@ -38,6 +38,5 @@ class SentimentAnalysisService(BaseModel):
         )
         trainer.train()
 
-        #Save the model
         trainer.save_model('sentiments/saved_model')
 

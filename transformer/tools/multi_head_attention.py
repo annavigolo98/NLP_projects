@@ -7,7 +7,6 @@ import torch.nn.functional as F
 class MultiHeadAttention(nn.Module):
     def __init__(self, d_k, d_model, n_heads, max_len, causal=False):
         super().__init__()
-        #Assume d_k = d_v
         self.d_k=d_k
         self.n_heads=n_heads
 
@@ -15,11 +14,8 @@ class MultiHeadAttention(nn.Module):
         self.query = nn.Linear(d_model, d_k*n_heads)
         self.value = nn.Linear(d_model, d_k*n_heads)
 
-        #final linear layer
         self.fc = nn.Linear(d_k*n_heads, d_model)
 
-        #Causal mask, make it so that diagonal is 0 too
-        #This way we do not need to shift the inputs to make the targets
         self.causal = causal
         if causal:
             cm = torch.tril(torch.ones(max_len, max_len))

@@ -25,7 +25,6 @@ class Train(BaseModel):
             t0 = datetime.now()
             train_loss = []
             for batch in tqdm(train_loader):
-                #Move data to the GPU
                 batch = {k: v.to(device) for k,v in batch.items()}
 
                 optimizer.zero_grad()
@@ -92,7 +91,6 @@ class Train(BaseModel):
 
             test_loss = np.mean(test_loss)
 
-            #Save losses
             train_losses[it] = train_loss
             test_losses[it] = test_loss
             dt = datetime.now()-t0

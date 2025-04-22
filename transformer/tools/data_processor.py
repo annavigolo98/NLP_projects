@@ -18,8 +18,6 @@ class DataProcessor(BaseModel):
                 )
 
             model_inputs['labels'] = labels['input_ids']
-            #model_inputs['decoder_mask'] = labels['attention_mask']
-            #This mask is not aligned with the decoder inputs, we should create it later
             return model_inputs
 
         tokenized_dataset = dataset.map(

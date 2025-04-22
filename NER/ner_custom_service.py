@@ -60,7 +60,7 @@ class NERCustomService(BaseModel):
 
         trainer.train()
 
-        #trainer.save_model('NER/saved_model_custom')
+        trainer.save_model('NER/saved_model_custom')
 
         
 
