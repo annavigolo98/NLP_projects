@@ -12,7 +12,7 @@ class DataProcessor(BaseModel):
         return tokenized_dataset
         
     def _tokenize_fn(self, batch, tokenizer, max_input_length, max_target_length):
-        #Give a list of sentences to the tokenizer
+        
         inputs = [x['en'] for x in batch['translation']]
         targets = [x['fr'] for x in batch['translation']]
 

@@ -11,7 +11,6 @@ class MetricEvaluator:
     def __call__(self, preds_and_labels):
         preds, labels = preds_and_labels
         decoded_preds = self.tokenizer.batch_decode(preds, skip_special_tokens=True)
-        #labels = np.where(labels == -100, labels, self.tokenizer.pad_token_id)
         labels = np.where(labels == -100, self.tokenizer.pad_token_id, labels)
         decoded_labels = self.tokenizer.batch_decode(labels, skip_special_tokens=True)
 
