@@ -41,13 +41,13 @@ class EncoderBlock(nn.Module):
 
 class Encoder(nn.Module):
     def __init__(self,
-               vocaboulary_size,
-               max_length,
-               d_k,
-               d_m,
-               heads,
-               n_encoder_blocks,
-               dropout_probability):
+                d_k,
+                d_m,
+                heads,
+                vocaboulary_size,
+                max_length,
+                n_encoder_blocks,
+                dropout_probability):
 
         super().__init__()
 

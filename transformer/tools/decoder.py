@@ -50,11 +50,11 @@ class DecoderBlock(nn.Module):
 
 class Decoder(nn.Module):
     def __init__(self,
-               vocaboulary_size,
-               max_length,
                d_k,
                d_m,
                heads,
+               vocaboulary_size,
+               max_length,
                n_decoder_blocks,
                dropout_probability):
         
