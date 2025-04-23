@@ -1,18 +1,14 @@
 # NLP
 This repository contains a set of NLP projects built using the Hugging Face `transformers` library.  
 These projects are inspired by exercises and concepts from the Udemy course  
-**"Data Science: Transformers For Natural Language Processing" by Lazy Programmer Inc.**.
-This is a personal learning repo.
+**"Data Science: Transformers For Natural Language Processing" by Lazy Programmer Inc**.
+This is a personal learning repo and does not contain any content of the course.
 
 The purpose of this repo is to:
-- Revisit and apply lessons from the course
-- Refactor and extend code using object-oriented programming (OOP) principles
+- Revisit exercises in a personal way, for learning purposes.
+- Refactor code using object-oriented programming (OOP) principles
 - Train and evaluate transformer models on various NLP tasks
 
-
-
-These exercises are based on the course lectures and revisited. Some exercises are made from the course's suggestions. The transformer library Hugging Face is used for the processing and fine-tuning 
-of the models. 
 
 1) sentiment analysis fine tuning: 
 
