@@ -18,5 +18,5 @@ class LoadData(BaseModel):
             json.dump(json_dict, out_file)
 
         data = load_dataset('json', data_files='NER/data/NER_custom_data.json')
-        splitted_dataset = data['train'].train_test_split(test_size=0.3, seed=seed)
+        splitted_dataset = data['train'].train_test_split(test_size=0.2, seed=seed)
         return splitted_dataset

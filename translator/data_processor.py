@@ -2,7 +2,12 @@ from pydantic import BaseModel
 
 class DataProcessor(BaseModel):
 
-    def tokenizer(self, dataset, tokenizer, max_input_length, max_target_length):
+    def tokenizer(self,
+                dataset,
+                tokenizer, 
+                max_input_length, 
+                max_target_length):
+        
         tokenized_dataset = dataset.map(lambda batch: self._tokenize_fn(batch, 
                                                                         tokenizer, 
                                                                         max_input_length, 

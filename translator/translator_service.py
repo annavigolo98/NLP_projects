@@ -12,14 +12,17 @@ class TranslatorService(BaseModel):
     def handle_translations(self, n_epochs, seed):
         '''Class for fine tuning for translations tasks'''
         dataset = load_dataset('kde4', lang1='en', lang2='fr', trust_remote_code=True)
-        small_dataset = dataset['train'].shuffle(seed=seed).select(range(1_000)) 
+        small_dataset = dataset['train'].shuffle(seed=seed).select(range(500)) 
         splitted_dataset = small_dataset.train_test_split(seed=seed)
 
         checkpoint = 'Helsinki-NLP/opus-mt-en-fr'
         tokenizer = AutoTokenizer.from_pretrained(checkpoint)
 
-        max_input_length = 128 
-        max_target_length = 128 
+        #See the histogram of the length of the input and 
+        # target sentences to select these parameters
+
+        max_input_length = 100 
+        max_target_length = 100
         
         data_processor = DataProcessor()
         tokenized_dataset = data_processor.tokenizer(splitted_dataset, tokenizer, max_input_length, max_target_length)
@@ -35,9 +38,9 @@ class TranslatorService(BaseModel):
             eval_strategy='no',
             save_strategy='epoch',
             learning_rate=2e-05,
-            per_device_train_batch_size=32,
-            per_device_eval_batch_size=64,
-            weight_decay=0.01,
+            per_device_train_batch_size=30,
+            per_device_eval_batch_size=60,
+            weight_decay=0.02,
             save_total_limit=3,
             num_train_epochs=n_epochs,
             predict_with_generate=True, 

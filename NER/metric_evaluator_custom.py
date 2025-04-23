@@ -14,15 +14,15 @@ class MetricEvaluatorCustom:
         logits, labels = logits_and_labels
         preds=np.argmax(logits, axis=-1)
 
-        str_labels=[
+        string_labels=[
             [self.label_names[t] for t in label if t!=-100] for label in labels
         ]
 
-        str_preds = [
+        string_predictions = [
             [self.label_names[p] for p, t in zip(pred, targ) if t!=-100] for pred, targ in zip(preds, labels)
         ]
-        labels_flat = self._flatten(str_labels)
-        preds_flat = self._flatten(str_preds)
+        labels_flat = self._flatten(string_labels)
+        preds_flat = self._flatten(string_predictions)
 
         acc = accuracy_score(labels_flat, preds_flat)
         f1 = f1_score(labels_flat, preds_flat, average='macro')

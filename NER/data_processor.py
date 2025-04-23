@@ -36,11 +36,11 @@ class DataProcessor(BaseModel):
         
         tokenized_batch = tokenizer(batch['tokens'], is_split_into_words=True, truncation=True)
         old_labels_batch = batch['ner_tags'] 
-        new_labels_batch = []
-        for i, old_labels_item in enumerate(old_labels_batch):
-            word_ids = tokenized_batch.word_ids(i)
-            new_labels = self._align_targets(word_ids, old_labels_item)
-            new_labels_batch.append(new_labels)
+        new_labels_batch = [
+            self._align_targets(tokenized_batch.word_ids(i), old_labels_instance)
+            for i, old_labels_instance in enumerate(old_labels_batch)
+        ]
+        
         tokenized_batch['labels'] = new_labels_batch 
         return tokenized_batch
     

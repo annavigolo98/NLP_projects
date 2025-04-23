@@ -41,7 +41,7 @@ class NERService(BaseModel):
             save_strategy = 'epoch',
             learning_rate = 2e-05,
             num_train_epochs = n_epochs,
-            weight_decay = 0.01
+            weight_decay = 0.02
         )
 
         trainer = Trainer(
