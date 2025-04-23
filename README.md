@@ -5,8 +5,8 @@ These projects are inspired by exercises and concepts from the Udemy course
 This is a personal learning repo.
 
 The purpose of this repo is to:
-- Revisit and apply lessons from the course
-- Refactor and extend code using object-oriented programming (OOP) principles
+- Revisit exercises in a personal way, for learning purposes.
+- Refactor code using object-oriented programming (OOP) principles
 - Train and evaluate transformer models on various NLP tasks
 
 
