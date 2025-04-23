@@ -17,7 +17,7 @@ from transformer.tools.translator import Translator
 
 class Seq2SeqService(BaseModel):
     
-    def handle_seq2seq(self, seed, n_epochs):
+    def handle_seq2seq(self, n_epochs):
         
         device = Device.get_device()
         dataset_loader = LoadData()
@@ -33,14 +33,14 @@ class Seq2SeqService(BaseModel):
         data_collator = DataCollatorForSeq2Seq(tokenizer)
 
         train_loader = DataLoader(
-            tokenized_datasets['train'].shuffle(seed=seed).select(range(100)),
+            tokenized_datasets['train'],
             shuffle=True,
             batch_size=64,
             collate_fn=data_collator
         )
 
         valid_loader = DataLoader(
-            tokenized_datasets['test'].shuffle(seed=seed).select(range(30)),
+            tokenized_datasets['test'],
             batch_size=64,
             collate_fn=data_collator
         )

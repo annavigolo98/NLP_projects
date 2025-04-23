@@ -9,10 +9,10 @@ from transformers import DataCollatorForSeq2Seq
 from transformers import Seq2SeqTrainingArguments, Seq2SeqTrainer
 
 class TranslatorService(BaseModel):
-    def handle_translations(self, seed):
+    def handle_translations(self, n_epochs, seed):
         '''Class for fine tuning for translations tasks'''
         dataset = load_dataset('kde4', lang1='en', lang2='fr', trust_remote_code=True)
-        small_dataset = dataset['train'].shuffle(seed=seed).select(range(1_000)) # Take only the first 1000 elements
+        small_dataset = dataset['train'].shuffle(seed=seed).select(range(1_000)) 
         splitted_dataset = small_dataset.train_test_split(seed=seed)
 
         checkpoint = 'Helsinki-NLP/opus-mt-en-fr'
@@ -39,7 +39,7 @@ class TranslatorService(BaseModel):
             per_device_eval_batch_size=64,
             weight_decay=0.01,
             save_total_limit=3,
-            num_train_epochs=3,
+            num_train_epochs=n_epochs,
             predict_with_generate=True, 
             fp16=True 
             )

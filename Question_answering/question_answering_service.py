@@ -7,7 +7,7 @@ from transformers import TrainingArguments, Trainer
 from transformers import AutoModelForQuestionAnswering 
 
 class QuestionAnsweringService(BaseModel):
-    def handle_question_answering(self):
+    def handle_question_answering(self, n_epochs):
         '''Handler of QA Task, This extracts the answer to a specific question from a document.'''
         dataset = load_dataset('squad')
 
@@ -33,7 +33,7 @@ class QuestionAnsweringService(BaseModel):
             eval_strategy='no',
             save_strategy='epoch',
             learning_rate=2e-05,
-            num_train_epochs=1,
+            num_train_epochs=n_epochs,
             weight_decay=0.01,
             fp16=True
         )
@@ -43,7 +43,7 @@ class QuestionAnsweringService(BaseModel):
         trainer = Trainer(
             model=model,
             args=arguments,
-            train_dataset = tokenized_train_dataset.select(range(50)).shuffle(seed=42),
+            train_dataset = tokenized_train_dataset,
             eval_dataset = tokenized_validation_dataset,
             tokenizer=tokenizer
         )

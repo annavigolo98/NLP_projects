@@ -11,7 +11,7 @@ from NER.metric_evaluator import MetricEvaluator
 
 class NERService(BaseModel):
 
-    def handle_NER(self):
+    def handle_NER(self, n_epochs):
         '''logic to implement Named Entity Recognition'''
         dataset = load_dataset('conll2003', trust_remote_code=True)
 
@@ -40,7 +40,7 @@ class NERService(BaseModel):
             eval_strategy = 'epoch', 
             save_strategy = 'epoch',
             learning_rate = 2e-05,
-            num_train_epochs = 3,
+            num_train_epochs = n_epochs,
             weight_decay = 0.01
         )
 

@@ -9,7 +9,7 @@ from sentiments.metric_evaluator import MetricEvaluator
 
 class SentimentAnalysisService(BaseModel):
 
-    def handle_sentiment_analysis(self):
+    def handle_sentiment_analysis(self, n_epochs):
         dataset = load_dataset('glue', 'sst2')
         checkpoint = 'distilbert-base-uncased'
         tokenizer = AutoTokenizer.from_pretrained(checkpoint)
@@ -19,7 +19,7 @@ class SentimentAnalysisService(BaseModel):
             'sentiments/checkpoints',
             eval_strategy='epoch',
             save_strategy='epoch',
-            num_train_epochs=1
+            num_train_epochs=n_epochs
             )
         model = AutoModelForSequenceClassification.from_pretrained(
             checkpoint,

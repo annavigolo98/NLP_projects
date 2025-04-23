@@ -11,11 +11,11 @@ from NER.metric_evaluator_custom import MetricEvaluatorCustom
 from NER.repository.load_data import LoadData
 
 class NERCustomService(BaseModel):
-    def handle_custom_ner_dataset(self, seed):
+    def handle_custom_ner_dataset(self, n_epochs, seed):
 
         label2idx = {'NUM': 0, 'CONJ': 1, '.': 2, 'VERB': 3, 'ADV': 4, 'NOUN': 5, 'ADP': 6, 'PRT': 7, 'X': 8, 'PRON': 9, 'DET': 10, 'ADJ': 11}
         idx2label = {0: 'NUM', 1: 'CONJ', 2: '.', 3: 'VERB', 4: 'ADV', 5: 'NOUN', 6: 'ADP', 7:'PRT', 8: 'X', 9: 'PRON', 10: 'DET', 11: 'ADJ'}
-        label_names = [idx2label[key] for key, value in idx2label.items()]
+        label_names = [idx2label[key] for key, _ in idx2label.items()]
         
         load_data = LoadData()
         splitted_dataset = load_data.load_custom_dataset(seed, label2idx)
@@ -42,7 +42,7 @@ class NERCustomService(BaseModel):
             evaluation_strategy='epoch',
             save_strategy='epoch',
             learning_rate=2e-5,
-            num_train_epochs=1,
+            num_train_epochs=n_epochs,
             weight_decay=0.01
         )
 
@@ -50,7 +50,7 @@ class NERCustomService(BaseModel):
         trainer = Trainer(
             model=model,
             args=training_args,
-            train_dataset=tokenized_datasets['train'].select(range(100)).shuffle(seed=42),
+            train_dataset=tokenized_datasets['train'],
             eval_dataset=tokenized_datasets['test'],
             data_collator=data_collator,
             compute_metrics=metric_eval,
