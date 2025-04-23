@@ -31,11 +31,11 @@ class DataProcessor(BaseModel):
             end_answer_tokens = []
 
             for i, offset in enumerate(offset_mapping):
-                #Find the start and end tokens of the context in the specific subcontext:
+                
                 sequence_ids = tokenized_batch.sequence_ids(i)
                 start_context_token = sequence_ids.index(1)
                 end_context_token = len(sequence_ids) - sequence_ids[::-1].index(1) -1
-                #Find the answer start and end chars
+               
                 sample_idx = original_sample_ids[i]
                 answer = answers[sample_idx]
                 start_answer_char = answer['answer_start'][0]

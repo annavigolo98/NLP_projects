@@ -33,28 +33,19 @@ class Train(BaseModel):
                 enc_mask = batch['attention_mask']
                 targets = batch['labels']
 
-                #targets: ['Hello', 'world', '<\s>']
-                #Sentence: ['<s>', 'Hello', 'world']
-                #Loss will ignore target '-100', alredy set
-                #But when creating the dec input we must give the appropriate token to the
-                #start of sentence token. The end of sentence is removed
-
-                #Shift targets forward to get the decoder input
                 dec_input = targets.clone().detach()
                 dec_input = torch.roll(dec_input, shifts=1, dims=1)
                 dec_input[:,0] = 65_001
 
-                #also convert all -100 to pad token id
                 dec_input = dec_input.masked_fill(
                     dec_input == -100, tokenizer.pad_token_id)
 
-                #make the decoder input mask
                 dec_mask = torch.ones_like(dec_input)
                 dec_mask = dec_mask.masked_fill(dec_input == tokenizer.pad_token_id, 0)
-                #Forward pass
+
                 outputs = model(enc_input, dec_input, enc_mask, dec_mask)
                 loss = criterion(outputs.transpose(2,1), targets)
-                #Backward and optimize
+                
                 loss.backward()
                 optimizer.step()
                 train_loss.append(loss.item())
@@ -71,17 +62,14 @@ class Train(BaseModel):
                 enc_mask = batch['attention_mask']
                 targets = batch['labels']
 
-                #shift the targets forwards to get the decoder input
                 dec_input = targets.clone().detach()
-                #Before we had the decoder inputs and shifted to the left (-1) to create the targets.
-                #Now we have the targets and want to create the dec_inputs by shifting to right 1
+
                 dec_input = torch.roll(dec_input, shifts=1, dims=1)
                 dec_input[:, 0] = 65_001
 
-                #change -100s to regular padding
                 dec_input = dec_input.masked_fill(
                     dec_input == -100, tokenizer.pad_token_id)
-                #make decoder input mask
+                
                 dec_mask = torch.ones_like(dec_input)
                 dec_mask = dec_mask.masked_fill(dec_input == tokenizer.pad_token_id,0)
 

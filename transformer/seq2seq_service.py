@@ -80,7 +80,7 @@ class Seq2SeqService(BaseModel):
         encoder.to(device)
         decoder.to(device)
 
-        criterion = nn.CrossEntropyLoss(ignore_index=-100)  # ignore pad tokens in the labels (here represented by -100)
+        criterion = nn.CrossEntropyLoss(ignore_index=-100)  
         optimizer = torch.optim.Adam(transformer.parameters())
 
         

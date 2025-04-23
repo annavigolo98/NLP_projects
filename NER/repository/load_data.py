@@ -11,11 +11,8 @@ class LoadData(BaseModel):
 
         corpus = brown.tagged_sents(tagset='universal')
 
-        json_dict = []
-
-        for sentence in corpus:
-            json_dict.append({'inputs': [str(word) for (word, _) in sentence],
-                            'targets': [label2idx[label] for (_, label) in sentence]})
+        json_dict = [{'inputs': [str(word) for (word, _) in sentence],
+                            'targets': [label2idx[label] for (_, label) in sentence]} for sentence in corpus]
 
         with open('NER/data/NER_custom_data.json', 'w') as out_file:
             json.dump(json_dict, out_file)

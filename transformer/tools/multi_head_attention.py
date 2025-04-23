@@ -33,14 +33,11 @@ class MultiHeadAttention(nn.Module):
         T_output = q.shape[1]
         T_input = k.shape[1]
 
-        #Change shape to:
         #(N, T, h, d_k)->(N, h, T, d_k)
-        # in order for matrix multiply to work properly
         q = q.view(N, T_output, self.n_heads, self.d_k).transpose(1,2)
         k = k.view(N, T_input, self.n_heads, self.d_k).transpose(1,2)
         v = v.view(N, T_input, self.n_heads, self.d_k).transpose(1,2)
 
-        #Compute attention weights
         #(N, h, T_out, d_k) x (N, h, d_k, T_in) -> (N, h, T_out, T_in)
         attn_scores = q @ k.transpose(-2,-1) / math.sqrt(self.d_k)
         if pad_mask is not None:
@@ -51,10 +48,8 @@ class MultiHeadAttention(nn.Module):
             self.causal_mask[:, :, :T_output, :T_input] == 0, float('-inf'))
         attn_weights = F.softmax(attn_scores, dim=-1)
 
-        #Compute attention weighted values
         #(N, h, T_out, T_in)x(N, h, T_in, d_k)->(N, h, T_out, d_k)
         A = attn_weights @ v
         A = A.transpose(1,2) #(N, T_out, h, d_k)
         A = A.contiguous().view(N, T_output, self.d_k * self.n_heads) # (N, T_out, h*d)
-        #projection
         return self.fc(A)

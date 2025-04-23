@@ -14,12 +14,11 @@ class MetricEvaluator(BaseModel):
             logits, labels = logits_and_labels
             preds=np.argmax(logits, axis=-1)
 
-            #remove -100 from labels and predictions
-            #and convert labels_ids to label names
+
             str_labels=[
                 [label_names[t] for t in label if t!=-100] for label in labels
             ]
-            # Remove -100 only if the true label is -100
+            
             str_preds = [
                 [label_names[p] for p, t in zip(pred, targ) if t!=-100] for pred, targ in zip(preds, labels)
             ]

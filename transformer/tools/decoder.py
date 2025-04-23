@@ -22,9 +22,7 @@ class DecoderBlock(nn.Module):
         self.dropout = nn.Dropout(p=dropout_prob)
 
     def forward(self, enc_output, dec_input, enc_mask=None, dec_mask=None):
-        #self-attention on decoder input
         x = self.ln1(dec_input + self.mha1(dec_input, dec_input, dec_input, dec_mask))
-        #multi head attention including encoder output
         x = self.ln2(x + self.mha2(x, enc_output, enc_output, enc_mask))
 
         x = self.ln3(x + self.ann(x))
