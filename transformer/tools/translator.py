@@ -10,28 +10,28 @@ class Translator(BaseModel):
                   decoder, 
                   device):
             
-        enc_input = tokenizer(input_sentence, return_tensors='pt').to(device)
-        enc_output = encoder(enc_input['input_ids'], enc_input['attention_mask'])
+        encoder_input = tokenizer(input_sentence, return_tensors='pt').to(device)
+        encoder_output = encoder(encoder_input['input_ids'], encoder_input['attention_mask'])
 
-        dec_input_ids = torch.tensor([[65_001]], device=device)
-        dec_attn_mask = torch.ones_like(dec_input_ids, device=device)
+        decoder_input_ids = torch.tensor([[65_001]], device=device)
+        decoder_attn_mask = torch.ones_like(decoder_input_ids, device=device)
 
         for _ in range(32):
             dec_output = decoder(
-                enc_output,
-                dec_input_ids,
-                enc_input['attention_mask'],
-                dec_attn_mask
+                encoder_output,
+                decoder_input_ids,
+                encoder_input['attention_mask'],
+                decoder_attn_mask
             )
 
             prediction_id = torch.argmax(dec_output[:, -1, :], axis=-1)
 
-            dec_input_ids = torch.hstack((dec_input_ids, prediction_id.view(1,1)))
+            decoder_input_ids = torch.hstack((decoder_input_ids, prediction_id.view(1,1)))
 
-            dec_attn_mask = torch.ones_like(dec_input_ids)
+            decoder_attn_mask = torch.ones_like(decoder_input_ids)
 
             if prediction_id == 0:
                 break
 
-        translation = tokenizer.decode(dec_input_ids[0, 1:])
+        translation = tokenizer.decode(decoder_input_ids[0, 1:])
         return translation

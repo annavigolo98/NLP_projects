@@ -17,7 +17,7 @@ from transformer.tools.translator import Translator
 
 class Seq2SeqService(BaseModel):
     
-    def handle_seq2seq(self):
+    def handle_seq2seq(self, seed, n_epochs):
         
         device = Device.get_device()
         dataset_loader = LoadData()
@@ -33,14 +33,14 @@ class Seq2SeqService(BaseModel):
         data_collator = DataCollatorForSeq2Seq(tokenizer)
 
         train_loader = DataLoader(
-            tokenized_datasets['train'],
+            tokenized_datasets['train'].shuffle(seed=seed).select(range(100)),
             shuffle=True,
             batch_size=64,
             collate_fn=data_collator
         )
 
         valid_loader = DataLoader(
-            tokenized_datasets['test'],
+            tokenized_datasets['test'].shuffle(seed=seed).select(range(30)),
             batch_size=64,
             collate_fn=data_collator
         )
@@ -48,23 +48,23 @@ class Seq2SeqService(BaseModel):
         tokenizer.add_special_tokens({'cls_token': '<s>'})
 
         encoder_config = {
-            'vocab_size': tokenizer.vocab_size +1,
-            'max_len': 512,
+            'vocaboulary_size': tokenizer.vocab_size +1,
+            'max_length': 512,
             'd_k': 16,
-            'd_model': 64,
-            'n_heads': 4,
-            'n_layers': 2,
-            'dropout_prob': 0.1
+            'd_m': 64,
+            'heads': 4,
+            'n_encoder_blocks': 2,
+            'dropout_probability': 0.1
         }
 
         decoder_config = {
-            'vocab_size': tokenizer.vocab_size +1,
-            'max_len': 512,
+            'vocaboulary_size': tokenizer.vocab_size +1,
+            'max_length': 512,
             'd_k': 16,
-            'd_model': 64,
-            'n_heads': 4,
-            'n_layers': 2,
-            'dropout_prob': 0.1
+            'd_m': 64,
+            'heads': 4,
+            'n_decoder_blocks': 2,
+            'dropout_probability': 0.1
         }
 
 
@@ -80,17 +80,17 @@ class Seq2SeqService(BaseModel):
         encoder.to(device)
         decoder.to(device)
 
-        criterion = nn.CrossEntropyLoss(ignore_index=-100)  
+        loss_function = nn.CrossEntropyLoss(ignore_index=-100)  
         optimizer = torch.optim.Adam(transformer.parameters())
 
         
         trainer = Train()
         train_losses, test_losses = trainer.train(transformer, 
-                                                  criterion, 
+                                                  loss_function, 
                                                   optimizer, 
                                                   train_loader, 
                                                   valid_loader, 
-                                                  epochs=15,
+                                                  n_epochs=n_epochs,
                                                   device=device,
                                                   tokenizer=tokenizer)
         

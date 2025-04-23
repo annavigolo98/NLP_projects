@@ -4,62 +4,81 @@ from transformer.tools.positional_encoding import PositionalEncoding
 
 
 class DecoderBlock(nn.Module):
-    def __init__(self, d_k, d_model, n_heads, max_len, dropout_prob=0.1):
+    def __init__(self,
+                d_k,
+                d_m, 
+                heads, 
+                max_causal_mask_length, 
+                dropout_probability=0.1):
+        
         super().__init__()
 
-        self.ln1 = nn.LayerNorm(d_model)
-        self.ln2 = nn.LayerNorm(d_model)
-        self.ln3 = nn.LayerNorm(d_model)
+        self.layer_norm_1 = nn.LayerNorm(d_m)
+        self.layer_norm_2 = nn.LayerNorm(d_m)
+        self.layer_norm_3 = nn.LayerNorm(d_m)
 
-        self.mha1 = MultiHeadAttention(d_k, d_model, n_heads, max_len, causal=True)
-        self.mha2 = MultiHeadAttention(d_k, d_model, n_heads, max_len, causal=False)
+        self.multi_head_attention_casual = MultiHeadAttention(d_k,
+                                                            d_m,
+                                                            heads, 
+                                                            max_causal_mask_length, 
+                                                            causal=True)
+        
+        self.multi_head_attention = MultiHeadAttention(d_k, 
+                                                       d_m, 
+                                                       heads, 
+                                                       max_causal_mask_length, 
+                                                       causal=False)
+        
         self.ann = nn.Sequential(
-            nn.Linear(d_model, d_model*4),
+            nn.Linear(d_m, d_m*4),
             nn.GELU(),
-            nn.Linear(d_model*4, d_model),
-            nn.Dropout(dropout_prob))
+            nn.Linear(d_m*4, d_m),
+            nn.Dropout(dropout_probability))
 
-        self.dropout = nn.Dropout(p=dropout_prob)
+        self.dropout = nn.Dropout(p=dropout_probability)
 
-    def forward(self, enc_output, dec_input, enc_mask=None, dec_mask=None):
-        x = self.ln1(dec_input + self.mha1(dec_input, dec_input, dec_input, dec_mask))
-        x = self.ln2(x + self.mha2(x, enc_output, enc_output, enc_mask))
+    def forward(self, enc_output, decoder_input, encoder_mask=None, decoder_mask=None):
 
-        x = self.ln3(x + self.ann(x))
+        x = self.layer_norm_1(decoder_input + self.multi_head_attention_casual(decoder_input, decoder_input, decoder_input, decoder_mask))
+        x = self.layer_norm_2(x + self.multi_head_attention(x, enc_output, enc_output, encoder_mask))
+        x = self.layer_norm_3(x + self.ann(x))
         x = self.dropout(x)
+
         return x
 
 
 
 class Decoder(nn.Module):
     def __init__(self,
-               vocab_size,
-               max_len,
+               vocaboulary_size,
+               max_length,
                d_k,
-               d_model,
-               n_heads,
-               n_layers,
-               dropout_prob):
+               d_m,
+               heads,
+               n_decoder_blocks,
+               dropout_probability):
+        
         super().__init__()
-        self.embedding = nn.Embedding(vocab_size, d_model)
-        self.pos_encoding = PositionalEncoding(d_model, max_len, dropout_prob)
+
+        self.embedding = nn.Embedding(vocaboulary_size, d_m)
+        self.positional_encoding = PositionalEncoding(d_m, max_length, dropout_probability)
         transformer_blocks = [
             DecoderBlock(
                 d_k,
-                d_model,
-                n_heads,
-                max_len,
-                dropout_prob) for _ in range(n_layers)]
+                d_m,
+                heads,
+                max_length,
+                dropout_probability) for _ in range(n_decoder_blocks)]
 
         self.transformer_blocks = nn.Sequential(*transformer_blocks)
-        self.ln = nn.LayerNorm(d_model)
-        self.fc = nn.Linear(d_model, vocab_size)
+        self.layer_norm = nn.LayerNorm(d_m)
+        self.linear_layer = nn.Linear(d_m, vocaboulary_size)
 
-    def forward(self, enc_output, dec_input, enc_mask=None, dec_mask=None):
-        x = self.embedding(dec_input)
-        x = self.pos_encoding(x)
+    def forward(self, encoder_output, decoder_input, encoder_mask=None, decoder_mask=None):
+        x = self.embedding(decoder_input)
+        x = self.positional_encoding(x)
         for block in self.transformer_blocks:
-            x = block(enc_output, x, enc_mask, dec_mask)
-        x = self.ln(x)
-        x = self.fc(x)
+            x = block(encoder_output, x, encoder_mask, decoder_mask)
+        x = self.layer_norm(x)
+        x = self.linear_layer(x)
         return x

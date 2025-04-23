@@ -9,22 +9,22 @@ from tqdm import tqdm
 class Train(BaseModel):
     def train(self,
              model,
-             criterion,
+             loss_function,
              optimizer, 
-             train_loader, 
-             valid_loader, 
-             epochs, 
+             train_dataloader, 
+             valid_dataloader, 
+             n_epochs, 
              device,
              tokenizer):
         
-        train_losses = np.zeros(epochs)
-        test_losses = np.zeros(epochs)
+        train_losses = np.zeros(n_epochs)
+        test_losses = np.zeros(n_epochs)
 
-        for it in range(epochs):
+        for it in range(n_epochs):
             model.train()
             t0 = datetime.now()
             train_loss = []
-            for batch in tqdm(train_loader):
+            for batch in tqdm(train_dataloader):
                 batch = {k: v.to(device) for k,v in batch.items()}
 
                 optimizer.zero_grad()
@@ -44,7 +44,7 @@ class Train(BaseModel):
                 dec_mask = dec_mask.masked_fill(dec_input == tokenizer.pad_token_id, 0)
 
                 outputs = model(enc_input, dec_input, enc_mask, dec_mask)
-                loss = criterion(outputs.transpose(2,1), targets)
+                loss = loss_function(outputs.transpose(2,1), targets)
                 
                 loss.backward()
                 optimizer.step()
@@ -55,7 +55,7 @@ class Train(BaseModel):
             model.eval()
             test_loss = []
 
-            for batch in valid_loader:
+            for batch in valid_dataloader:
                 batch = {k: v.to(device) for k,v in batch.items()}
 
                 enc_input = batch['input_ids']
@@ -74,7 +74,7 @@ class Train(BaseModel):
                 dec_mask = dec_mask.masked_fill(dec_input == tokenizer.pad_token_id,0)
 
                 outputs = model(enc_input, dec_input, enc_mask, dec_mask)
-                loss = criterion(outputs.transpose(2,1), targets)
+                loss = loss_function(outputs.transpose(2,1), targets)
                 test_loss.append(loss.item())
 
             test_loss = np.mean(test_loss)
@@ -83,6 +83,6 @@ class Train(BaseModel):
             test_losses[it] = test_loss
             dt = datetime.now()-t0
 
-            print(f'Epoch {it+1}/{epochs}, Train Loss: {train_loss:.4f}, \
+            print(f'Epoch {it+1}/{n_epochs}, Train Loss: {train_loss:.4f}, \
             Test Loss: {test_loss:.4f}, Duration: {dt}')
         return train_losses, test_losses

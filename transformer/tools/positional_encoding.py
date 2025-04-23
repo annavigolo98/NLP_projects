@@ -3,16 +3,16 @@ import torch
 import torch.nn as nn
 
 class PositionalEncoding(nn.Module):
-    def __init__(self, d_model, max_len=2048, dropout_prob=0.1):
+    def __init__(self, d_m, max_len=2048, dropout_prob=0.1):
         super().__init__()
         self.dropout = nn.Dropout(p=dropout_prob)
 
         position = torch.arange(max_len).unsqueeze(1)
-        exp_term = torch.arange(0, d_model, 2)
-        div_term = torch.exp(exp_term * (-math.log(10000.0) / d_model))
-        pe = torch.zeros(1, max_len, d_model)
-        pe[0, :, 0::2] = torch.sin(position * div_term)
-        pe[0, :, 1::2] = torch.cos(position * div_term)
+        exponent = torch.arange(0, d_m, 2)
+        divergence = torch.exp(exponent * (-math.log(10000.0) / d_m))
+        pe = torch.zeros(1, max_len, d_m)
+        pe[0, :, 0::2] = torch.sin(position * divergence)
+        pe[0, :, 1::2] = torch.cos(position * divergence)
         self.register_buffer('pe', pe)
 
     def forward(self, x):
