@@ -51,7 +51,14 @@ class MetricEvaluator:
             return metric.compute(predictions=predicted_answers, references=true_answers)
     
 
-    def _find_answer(self, start_logits, end_logits, offset_mapping, n_largest, max_answer_length, context):
+    def _find_answer(self, 
+                    start_logits, 
+                    end_logits, 
+                    offset_mapping, 
+                    n_largest, 
+                    max_answer_length, 
+                    context):
+        
         start_logit = start_logits
         end_logit = end_logits
         offsets = offset_mapping
