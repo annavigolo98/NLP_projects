@@ -14,8 +14,8 @@ class QuestionAnsweringService(BaseModel):
         checkpoint='distilbert-base-cased'
         tokenizer = AutoTokenizer.from_pretrained(checkpoint)
 
-        max_length = 384
-        stride = 128
+        max_length = 380
+        stride = 120
         
         data_processor = DataProcessor()
         tokenized_train_dataset = data_processor.tokenizer_train(dataset['train'],
