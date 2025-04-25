@@ -18,12 +18,18 @@ class QuestionAnsweringService(BaseModel):
         stride = 120
         
         data_processor = DataProcessor()
-        tokenized_train_dataset = data_processor.tokenizer_train(dataset['train'],
+
+        
+        small_validation_dataset = dataset['validation'].shuffle(seed=42).select(range(30))
+        small_train_dataset = dataset['train'].shuffle(seed=42).select(range(100))
+
+        tokenized_train_dataset = data_processor.tokenizer_train(small_train_dataset,
                                                                  tokenizer,
                                                                  max_length,
                                                                  stride)
-
-        tokenized_validation_dataset = data_processor.tokenizer_validation(dataset['validation'],
+        
+        
+        tokenized_validation_dataset = data_processor.tokenizer_validation(small_validation_dataset,
                                                                  tokenizer,
                                                                  max_length,
                                                                  stride)
@@ -40,6 +46,7 @@ class QuestionAnsweringService(BaseModel):
 
         model = AutoModelForQuestionAnswering.from_pretrained(checkpoint)
 
+        
         trainer = Trainer(
             model=model,
             args=arguments,
@@ -58,7 +65,7 @@ class QuestionAnsweringService(BaseModel):
         computed_metric = metric_evaluator.compute_metrics(start_logits,
                                                            end_logits,
                                                            tokenized_validation_dataset,
-                                                           dataset['validation'])
+                                                           small_validation_dataset)
         print('Computed_metric: ', computed_metric, '\n')
         
 

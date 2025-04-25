@@ -67,6 +67,9 @@ class DataProcessor(BaseModel):
                     end_context_window_token,
                     start_answer_char,
                     end_answer_char):
+            
+            start_answer_token = 0
+            end_answer_token = 0
 
             if offset[start_context_window_token][0] > start_answer_char or offset[end_context_window_token][1] < end_answer_char:
                 pass
@@ -78,10 +81,6 @@ class DataProcessor(BaseModel):
                 end_answer_token = next((i for i, start_end_ctx_char in enumerate(offset[start_context_window_token:]) 
                                       if start_end_ctx_char[1] == end_answer_char),None)
                 
-
-            if start_answer_token is None or end_answer_token is None:
-                raise Exception("start answer token or end answer token not correctly found")
-            
             return start_answer_token, end_answer_token
     
 
