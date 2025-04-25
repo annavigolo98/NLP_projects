@@ -30,37 +30,16 @@ class MetricEvaluator:
                 sample_id = sample['id']
                 context = sample['context']
 
-                #best_score = float('-inf')
-                best_answer = None 
-
-                for idx in sample_id2idxs[sample_id]:
-                    start_logit = start_logits[idx]
-                    end_logit = end_logits[idx]
-                    offsets = processed_dataset['offset_mapping'][idx]
-                    start_indices = np.argsort(start_logit)[:n_largest]
-                    end_indices = np.argsort(end_logit)[:n_largest]
-
-                    _, start_idx, end_idx = next(( (start_logit[start_idx] + end_logit[end_idx], start_idx, end_idx )
-                                 for start_idx, end_idx in product(reversed(start_indices), reversed(end_indices))
-                                 if offsets[start_idx] is not None and offsets[end_idx] is not None
-                                 and start_idx <= end_idx and end_idx-start_idx+1 <= max_answer_length), (None, None, None))
-                    
-                    if start_idx is not None and end_idx is not None:
-                        first_ch, last_ch = offsets[start_idx][0], offsets[end_idx][1]
-                        best_answer = context[first_ch:last_ch]
-
-                    #for start_idx in reversed(start_indices):
-                    #    for end_idx in reversed(end_indices):
-                    #        if offsets[start_idx] is None or offsets[end_idx] is None or end_idx < start_idx or end_idx-start_idx+1 > max_answer_length:
-                    #            continue 
-                            
-                    #        score = start_logit[start_idx] + end_logit[end_idx]
-
-                    #        if score > best_score:
-                    #            best_score = score 
-                    #            first_ch, last_ch = offsets[start_idx][0], offsets[end_idx][1]
-                    #            best_answer = context[first_ch:last_ch]
-
+                possible_answers = [ self._find_answer(
+                                start_logits[idx],
+                                end_logits[idx],
+                                processed_dataset['offset_mapping'][idx],
+                                n_largest,
+                                max_answer_length,
+                                context
+                                ) for idx in sample_id2idxs[sample_id] ]
+                
+                best_answer = next((answer for answer in possible_answers), None)
                 predicted_answers.append({'id': sample_id, 'prediction_text': best_answer})
 
 
@@ -70,3 +49,24 @@ class MetricEvaluator:
             
             metric = evaluate.load('squad')
             return metric.compute(predictions=predicted_answers, references=true_answers)
+    
+
+    def _find_answer(self, start_logits, end_logits, offset_mapping, n_largest, max_answer_length, context):
+        start_logit = start_logits
+        end_logit = end_logits
+        offsets = offset_mapping
+        start_indices = np.argsort(start_logit)[:n_largest]
+        end_indices = np.argsort(end_logit)[:n_largest]
+
+        best_answer = None
+
+        _, start_idx, end_idx = next(( (start_logit[start_idx] + end_logit[end_idx], start_idx, end_idx )
+                        for start_idx, end_idx in product(reversed(start_indices), reversed(end_indices))
+                        if offsets[start_idx] is not None and offsets[end_idx] is not None
+                        and start_idx <= end_idx and end_idx-start_idx+1 <= max_answer_length), (None, None, None))
+        
+        if start_idx is not None and end_idx is not None:
+            first_ch, last_ch = offsets[start_idx][0], offsets[end_idx][1]
+            best_answer = context[first_ch:last_ch]
+
+        return best_answer
