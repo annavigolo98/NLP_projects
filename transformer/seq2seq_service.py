@@ -17,18 +17,25 @@ from transformer.tools.translator import Translator
 
 class Seq2SeqService(BaseModel):
     
-    def handle_seq2seq(self, n_epochs):
+    def handle_seq2seq(self, n_epochs, seed):
         
         device = Device.get_device()
         dataset_loader = LoadData()
         data_processor = DataProcessor()
         
         raw_dataset = dataset_loader.load_dataset()
-        split = data_processor.train_test_split(raw_dataset, test_size=0.3)
+        split = data_processor.train_test_split(raw_dataset, test_size=0.3, seed=seed)
         
         model_checkpoint = 'Helsinki-NLP/opus-mt-en-es'
         tokenizer = AutoTokenizer.from_pretrained(model_checkpoint)
-        tokenized_datasets = data_processor.tokenizer(split, tokenizer)
+
+        input_choice = 'en'
+        target_choice = 'es'
+        max_input_length, max_target_length = data_processor.calculate_max_sentence_length(split['train'],
+                                                                                           input_choice,
+                                                                                           target_choice)
+
+        tokenized_datasets = data_processor.tokenizer(split, tokenizer, max_input_length, max_target_length)
 
         data_collator = DataCollatorForSeq2Seq(tokenizer)
 

@@ -18,13 +18,12 @@ class TranslatorService(BaseModel):
         checkpoint = 'Helsinki-NLP/opus-mt-en-fr'
         tokenizer = AutoTokenizer.from_pretrained(checkpoint)
 
-        #See the histogram of the length of the input and 
-        # target sentences to select these parameters
-
-        max_input_length = 100 
-        max_target_length = 100
         
         data_processor = DataProcessor()
+        max_input_length, max_target_length = data_processor.calculate_max_sentence_length(dataset['train'],
+                                                                                           'en',
+                                                                                           'fr')
+        
         tokenized_dataset = data_processor.tokenizer(splitted_dataset, tokenizer, max_input_length, max_target_length)
 
         model = AutoModelForSeq2SeqLM.from_pretrained(checkpoint)
