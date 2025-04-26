@@ -29,21 +29,21 @@ class Train(BaseModel):
 
                 optimizer.zero_grad()
 
-                enc_input = batch['input_ids']
-                enc_mask = batch['attention_mask']
+                encoder_input = batch['input_ids']
+                encoder_mask = batch['attention_mask']
                 targets = batch['labels']
 
-                dec_input = targets.clone().detach()
-                dec_input = torch.roll(dec_input, shifts=1, dims=1)
-                dec_input[:,0] = 65_001
+                decoder_input = targets.clone().detach()
+                decoder_input = torch.roll(decoder_input, shifts=1, dims=1)
+                decoder_input[:,0] = 65_001
 
-                dec_input = dec_input.masked_fill(
-                    dec_input == -100, tokenizer.pad_token_id)
+                decoder_input = decoder_input.masked_fill(
+                    decoder_input == -100, tokenizer.pad_token_id)
 
-                dec_mask = torch.ones_like(dec_input)
-                dec_mask = dec_mask.masked_fill(dec_input == tokenizer.pad_token_id, 0)
+                decoder_mask = torch.ones_like(decoder_input)
+                decoder_mask = decoder_mask.masked_fill(decoder_input == tokenizer.pad_token_id, 0)
 
-                outputs = model(enc_input, dec_input, enc_mask, dec_mask)
+                outputs = model(encoder_input, decoder_input, encoder_mask, decoder_mask)
                 loss = loss_function(outputs.transpose(2,1), targets)
                 
                 loss.backward()
@@ -58,22 +58,22 @@ class Train(BaseModel):
             for batch in valid_dataloader:
                 batch = {k: v.to(device) for k,v in batch.items()}
 
-                enc_input = batch['input_ids']
-                enc_mask = batch['attention_mask']
+                encoder_input = batch['input_ids']
+                encoder_mask = batch['attention_mask']
                 targets = batch['labels']
 
-                dec_input = targets.clone().detach()
+                decoder_input = targets.clone().detach()
 
-                dec_input = torch.roll(dec_input, shifts=1, dims=1)
-                dec_input[:, 0] = 65_001
+                decoder_input = torch.roll(decoder_input, shifts=1, dims=1)
+                decoder_input[:, 0] = 65_001
 
-                dec_input = dec_input.masked_fill(
-                    dec_input == -100, tokenizer.pad_token_id)
+                decoder_input = decoder_input.masked_fill(
+                    decoder_input == -100, tokenizer.pad_token_id)
                 
-                dec_mask = torch.ones_like(dec_input)
-                dec_mask = dec_mask.masked_fill(dec_input == tokenizer.pad_token_id,0)
+                decoder_mask = torch.ones_like(decoder_input)
+                decoder_mask = decoder_mask.masked_fill(decoder_input == tokenizer.pad_token_id,0)
 
-                outputs = model(enc_input, dec_input, enc_mask, dec_mask)
+                outputs = model(encoder_input, decoder_input, encoder_mask, decoder_mask)
                 loss = loss_function(outputs.transpose(2,1), targets)
                 test_loss.append(loss.item())
 
