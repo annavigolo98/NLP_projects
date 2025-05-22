@@ -10,6 +10,7 @@ class Plotter(BaseModel):
         plt.xlabel('N_epochs')
         plt.ylabel('Loss')
         plt.grid()
+        plt.legend()
         plt.savefig('transformer/plots/loss_vs_epoch_plot.png')
         plt.close()
 
@@ -19,7 +20,8 @@ class Plotter(BaseModel):
         plt.plot(validation_metric, label='Validation metric')
         plt.title(f'{metric_name} metric vs number of epochs')
         plt.xlabel('N_epochs')
-        plt.ylabel('Loss')
+        plt.ylabel(f'{metric_name}')
         plt.grid()
+        plt.legend()
         plt.savefig(f'transformer/plots/{metric_name}_vs_epoch_plot.png')
         plt.close()
