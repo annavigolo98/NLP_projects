@@ -14,12 +14,14 @@ from transformer.tools.encoder import Encoder
 from transformer.tools.train import Train
 from transformer.tools.transformer import Transformer
 from transformer.tools.translator import Translator
+from transformer.tools.plotter import Plotter
 
 class Seq2SeqService(BaseModel):
     
     def handle_seq2seq(self, n_epochs, seed):
         
         device = Device.get_device()
+        print('Device used: ', device)
         dataset_loader = LoadData()
         data_processor = DataProcessor()
         
@@ -43,7 +45,7 @@ class Seq2SeqService(BaseModel):
             tokenized_datasets['train'],
             shuffle=True,
             batch_size=64,
-            collate_fn=data_collator
+            collate_fn=data_collator  #padding and pytorch tensor conversion
         )
 
         valid_loader = DataLoader(
@@ -92,7 +94,7 @@ class Seq2SeqService(BaseModel):
 
         
         trainer = Train()
-        train_losses, test_losses = trainer.train(transformer, 
+        train_losses, eval_losses, bleu_scores_train, bleu_scores_eval = trainer.train(transformer, 
                                                   loss_function, 
                                                   optimizer, 
                                                   train_loader, 
@@ -102,8 +104,9 @@ class Seq2SeqService(BaseModel):
                                                   tokenizer=tokenizer)
         
 
-        print('Train losses: ', train_losses, '\n')
-        print('Test losses: ', test_losses)
+        plotter = Plotter()
+        plotter.plot_loss(train_losses, eval_losses)
+        plotter.plot_metrics(bleu_scores_train, bleu_scores_eval, 'Bleu-score')
         
         transformer.save_pretrained(r'transformer\saved_model\model')
         tokenizer.save_pretrained(r'transformer\saved_model\tokenizer')

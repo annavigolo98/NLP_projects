@@ -3,6 +3,7 @@ import numpy as np
 from pydantic import BaseModel
 import torch
 from tqdm import tqdm
+from transformer.tools.metric_evaluator import MetricEvaluator
 
 
 
@@ -19,6 +20,19 @@ class Train(BaseModel):
         
         train_losses = np.zeros(n_epochs)
         test_losses = np.zeros(n_epochs)
+
+        train_predictions = []
+        train_references = []
+
+        metric_evaluator = MetricEvaluator(tokenizer, translated_language='es')
+
+
+        bleu_scores_train = []
+        bleu_scores_eval = []
+
+
+        eval_predictions = []
+        eval_references = []
 
         for it in range(n_epochs):
             model.train()
@@ -50,7 +64,21 @@ class Train(BaseModel):
                 optimizer.step()
                 train_loss.append(loss.item())
 
+                #Metric 
+                #CREATE GENERATE FUNC
+                with torch.no_grad():
+                    generated_predictions = model.generate(encoder_input, encoder_mask, max_tokens=32, device=device)
+                    decoder_predictions = tokenizer.batch_decode(generated_predictions, skip_special_tokens=True)
+                    labels = targets.clone()
+                    labels[labels == -100] = tokenizer.pad_token_id
+                    decoded_labels = tokenizer.batch_decode(labels, skip_special_tokens=True)
+
+                    train_predictions.extend(decoder_predictions)
+                    train_references.extend([label] for label in decoded_labels)
+
+            bleu_scores_train.append(metric_evaluator(train_predictions, train_references))
             train_loss = np.mean(train_loss)
+
 
             model.eval()
             test_loss = []
@@ -77,12 +105,28 @@ class Train(BaseModel):
                 loss = loss_function(outputs.transpose(2,1), targets)
                 test_loss.append(loss.item())
 
+                #Metric 
+                #CREATE GENERATE FUNC
+                with torch.no_grad():
+                    generated_predictions = model.generate(encoder_input, encoder_mask, max_tokens=32, device=device)
+                    decoder_predictions = tokenizer.batch_decode(generated_predictions, skip_special_tokens=True)
+                    labels = targets.clone()
+                    labels[labels == -100] = tokenizer.pad_token_id
+                    decoded_labels = tokenizer.batch_decode(labels, skip_special_tokens=True)
+
+                    eval_predictions.extend(decoder_predictions)
+                    eval_references.extend([label] for label in decoded_labels)
+
             test_loss = np.mean(test_loss)
+            bleu_scores_eval.append(metric_evaluator(eval_predictions, eval_references))
 
             train_losses[it] = train_loss
             test_losses[it] = test_loss
             dt = datetime.now()-t0
 
+    
+
+
             print(f'Epoch {it+1}/{n_epochs}, Train Loss: {train_loss:.4f}, \
             Test Loss: {test_loss:.4f}, Duration: {dt}')
-        return train_losses, test_losses
+        return train_losses, test_losses, bleu_scores_train, bleu_scores_eval
