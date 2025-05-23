@@ -66,7 +66,7 @@ class Train(BaseModel):
                 #Metric 
                 #CREATE GENERATE FUNC
                 with torch.no_grad():
-                    generated_predictions = model.generate(encoder_input, encoder_mask, max_tokens=32, device=device)
+                    generated_predictions = model.generate(encoder_input, encoder_mask, max_tokens=58, device=device)
                     decoder_predictions = tokenizer.batch_decode(generated_predictions, skip_special_tokens=True)
                     labels = targets.clone()
                     labels[labels == -100] = tokenizer.pad_token_id
@@ -107,7 +107,7 @@ class Train(BaseModel):
                 #Metric 
                 #CREATE GENERATE FUNC
                 with torch.no_grad():
-                    generated_predictions = model.generate(encoder_input, encoder_mask, max_tokens=32, device=device)
+                    generated_predictions = model.generate(encoder_input, encoder_mask, max_tokens=58, device=device)
                     decoder_predictions = tokenizer.batch_decode(generated_predictions, skip_special_tokens=True)
                     labels = targets.clone()
                     labels[labels == -100] = tokenizer.pad_token_id
