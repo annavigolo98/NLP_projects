@@ -89,6 +89,12 @@ The purpose of this repo is to:
 '52_transformers_test.py': tests the model.
 
 
+![Bleu-score_vs_epoch_plot](https://github.com/user-attachments/assets/ebb07606-7d72-4491-8f3f-102cf10ef8f0)
+
+
+![loss_vs_epoch_plot](https://github.com/user-attachments/assets/00b9e345-5880-4a1b-b40e-8c3fb9ab7e35)
+
+
 REQUIREMENTS:
 
 'requirements_cpu.txt': used for the requirements in the CPU only machine. 
