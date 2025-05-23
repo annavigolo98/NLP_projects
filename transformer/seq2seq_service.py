@@ -95,14 +95,20 @@ class Seq2SeqService(BaseModel):
         
         trainer = Train()
         train_losses, eval_losses, bleu_scores_train, bleu_scores_eval = trainer.train(transformer, 
-                                                  loss_function, 
-                                                  optimizer, 
-                                                  train_loader, 
-                                                  valid_loader, 
-                                                  n_epochs=n_epochs,
-                                                  device=device,
-                                                  tokenizer=tokenizer)
-        
+                                                                                        loss_function, 
+                                                                                        optimizer, 
+                                                                                        train_loader, 
+                                                                                        valid_loader, 
+                                                                                        n_epochs=n_epochs,
+                                                                                        device=device,
+                                                                                        tokenizer=tokenizer)
+
+        print('Train losses: ', train_losses, '\n')
+        print('Eval losses: ', eval_losses, '\n')
+
+        print('Train metric Bleu: ', bleu_scores_train, '\n')
+        print('Eval metric Bleu: ', bleu_scores_eval, '\n')
+
 
         plotter = Plotter()
         plotter.plot_loss(train_losses, eval_losses)

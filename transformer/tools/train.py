@@ -30,7 +30,6 @@ class Train(BaseModel):
         bleu_scores_train = []
         bleu_scores_eval = []
 
-
         eval_predictions = []
         eval_references = []
 
@@ -83,7 +82,7 @@ class Train(BaseModel):
             model.eval()
             test_loss = []
 
-            for batch in valid_dataloader:
+            for batch in tqdm(valid_dataloader):
                 batch = {k: v.to(device) for k,v in batch.items()}
 
                 encoder_input = batch['input_ids']
@@ -117,8 +116,9 @@ class Train(BaseModel):
                     eval_predictions.extend(decoder_predictions)
                     eval_references.extend([label] for label in decoded_labels)
 
-            test_loss = np.mean(test_loss)
             bleu_scores_eval.append(metric_evaluator(eval_predictions, eval_references))
+
+            test_loss = np.mean(test_loss)
 
             train_losses[it] = train_loss
             test_losses[it] = test_loss
