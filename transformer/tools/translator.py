@@ -16,7 +16,7 @@ class Translator(BaseModel):
         decoder_input_ids = torch.tensor([[65_001]], device=device)
         decoder_attn_mask = torch.ones_like(decoder_input_ids, device=device)
 
-        for _ in range(32):
+        for _ in range(58):
             dec_output = decoder(
                 encoder_output,
                 decoder_input_ids,

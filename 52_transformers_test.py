@@ -3,7 +3,7 @@ from transformer.seq2seq_service import Seq2SeqService
 def main():
 
     service = Seq2SeqService()
-    sentence_to_translate = 'Can you speak Spanish?'
+    sentence_to_translate = 'I love pizza'
     service.translate_sentence(sentence_to_translate)
 
 

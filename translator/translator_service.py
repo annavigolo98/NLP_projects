@@ -12,7 +12,7 @@ class TranslatorService(BaseModel):
     def handle_translations(self, n_epochs, seed):
         '''Class for fine tuning for translations tasks'''
         dataset = load_dataset('kde4', lang1='en', lang2='fr', trust_remote_code=True)
-        small_dataset = dataset['train'].shuffle(seed=seed).select(range(500)) 
+        small_dataset = dataset['train'].shuffle(seed=seed).select(range(5000)) 
         splitted_dataset = small_dataset.train_test_split(seed=seed)
 
         checkpoint = 'Helsinki-NLP/opus-mt-en-fr'
@@ -34,7 +34,8 @@ class TranslatorService(BaseModel):
 
         training_arguments = Seq2SeqTrainingArguments(
             output_dir='translator/checkpoints',
-            eval_strategy='no',
+            logging_strategy='epoch',
+            eval_strategy='no',  #no evaluation after each training epoch only at the end
             save_strategy='epoch',
             learning_rate=2e-05,
             per_device_train_batch_size=30,

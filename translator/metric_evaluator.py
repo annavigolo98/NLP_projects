@@ -23,4 +23,4 @@ class MetricEvaluator:
         bert_score = self.metric_bert.compute(predictions=decoded_predictions, 
                                               references=decoded_labels, 
                                               lang=self.translated_language)
-        return {'bleu': bleu_score, 'bert_score': np.mean(bert_score['f1'])}
+        return {'bleu': bleu_score['score'], 'bert_score': np.mean(bert_score['f1'])}
